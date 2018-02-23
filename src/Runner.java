@@ -112,26 +112,32 @@ class Deck{
         if(lowerIndex<higherIndex){
             //find the center of whatever group is being sorted right now, could be the largest or a smaller group
             //since it's an int variable, it automatically rounds to the lowest integer
+
+            // say you're just sorting a two term array, [3, 2]
+            //lowerIndex is 0, higherIndex is 2 (the number of things in the array), middleIndex is 1
             int middleIndex = lowerIndex + (higherIndex-lowerIndex)/2;
 
             //now sort the bottom group, come back when you're done
             //if it's a group of just one element, it comes right back
             //if it's a group with more than one element, it sorts that group
-            mergeSortHand(lowerIndex, middleIndex);
+            mergeSortHand(lowerIndex, middleIndex-1);
 
             //now sort the top group, come back when you're done
-            mergeSortHand(middleIndex+1, higherIndex);
+            mergeSortHand(middleIndex, higherIndex-1);//will this cause an error?
 
             //now we have to combine the terms from the lower group and higher group
-            // say you're just sorting one array, [3, 2]
-            //lowerIndex is 0, higherIndex is 1
-            Card[] setAside = new Card[(higherIndex-lowerIndex)/*+1*/];
+
+            //setAside is where I'll stick the elements as I compare them
+            Card[] setAside = new Card[(higherIndex-lowerIndex)];
+
+            //in the example, this will make bottomGroupChecker 0, with value 3
+            //and topGroupChecker will be 1, with value 2
             int bottomGroupChecker = lowerIndex;
             int topGroupChecker = middleIndex;
             int elemsSorted = 0;
-            /*this.listCards(hand);
-            System.out.println(Integer.toString(hand[topGroupChecker].value));
-            System.out.println(Integer.toString(hand[bottomGroupChecker].value));*/
+            System.out.println(Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
+            //higherIndex is always out of bounds, we never want to check there
+            //middleIndex gets checked by the top group
             while(bottomGroupChecker<middleIndex || topGroupChecker<higherIndex){
                 //System.out.println("this works 3");
                 if((hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<middleIndex)
