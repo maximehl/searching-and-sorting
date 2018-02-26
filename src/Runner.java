@@ -18,7 +18,7 @@ public class Runner {
         d.shuffleDeck();
         d.dealHand(7);
         System.out.println("Merge sort!");
-        d.mergeSortHand(0, 7);
+        d.mergeSortHand(0, 6);
         System.out.println("Merge sort done!");
     }
 }
@@ -106,56 +106,69 @@ class Deck{
     }
 
     public void mergeSortHand(int lowerIndex, int higherIndex){
+        //higherIndex should be index of the last value of the array, there is an object at higherIndex
+
         //if lowerIndex is not lower than higherIndex, they must be equal, so it's successfully broken down the
         //array to single elements
-        System.out.println(Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
+        System.out.println("split " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
         if(lowerIndex<higherIndex){
             //find the center of whatever group is being sorted right now, could be the largest or a smaller group
             //since it's an int variable, it automatically rounds to the lowest integer
 
-            // say you're just sorting a two term array, [3, 2]
-            //lowerIndex is 0, higherIndex is 2 (the number of things in the array), middleIndex is 1
+            // say you're just sorting a two term array, [3,2]
+            //lowerIndex is 0, higherIndex is 1 (the number of things in the array), middleIndex is 0
             int middleIndex = lowerIndex + (higherIndex-lowerIndex)/2;
 
             //now sort the bottom group, come back when you're done
             //if it's a group of just one element, it comes right back
-            //if it's a group with more than one element, it sorts that group
-            mergeSortHand(lowerIndex, middleIndex-1);
+            //if it's a group with more than one element, it sorts that group, from the element at lowerIndex
+            // and including the element at the middleIndex
+            mergeSortHand(lowerIndex, middleIndex);
 
             //now sort the top group, come back when you're done
-            mergeSortHand(middleIndex, higherIndex-1);//will this cause an error?
+            //sorts the group from the element just after middleIndex and including higherIndex
+            mergeSortHand(middleIndex+1, higherIndex);
 
             //now we have to combine the terms from the lower group and higher group
 
             //setAside is where I'll stick the elements as I compare them
-            Card[] setAside = new Card[(higherIndex-lowerIndex)];
+            //+1, since there's we're including the bottomIndex
+            Card[] setAside = new Card[(higherIndex-lowerIndex)+1];
 
-            //in the example, this will make bottomGroupChecker 0, with value 3
+            //in the [3,2] example, this will make bottomGroupChecker 0, with value 3
             //and topGroupChecker will be 1, with value 2
             int bottomGroupChecker = lowerIndex;
-            int topGroupChecker = middleIndex;
-            int elemsSorted = 0;
-            System.out.println(Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
+            //this should compare the elements from lowerIndex and including middleIndex
+            int topGroupChecker = middleIndex+1;
+            //this should compare the elements from just after middleIndex and including higherIndex
+            int elementsSorted = 0;
+            System.out.println("combine " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
             //higherIndex is always out of bounds, we never want to check there
             //middleIndex gets checked by the top group
             while(bottomGroupChecker<middleIndex || topGroupChecker<higherIndex){
-                //System.out.println("this works 3");
+                //if we're in here, we know that there are values that still have to be checked, either in the
+                // bottomGroup, or the topGroup, or both
                 if((hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<middleIndex)
                         ||topGroupChecker==higherIndex){
-                    //System.out.println("this works 1");
-                    setAside[elemsSorted] = hand[bottomGroupChecker];
+                    //if we're here, we know that either the topGroupChecker is at the higherIndex, and we don't
+                    // want to check those values anymore, or the bottomGroupChecker IS below the middleIndex (so there
+                    // are bottomGroup values that remain to be checked, and the bottomGroup value is lower than the
+                    // topGroup value
+                    setAside[elementsSorted] = hand[bottomGroupChecker];
                     bottomGroupChecker++;
                 }else{
-                    //System.out.println("this works 2");
-                    setAside[elemsSorted] = hand[topGroupChecker];
+                    //if we're here, then we know that the topGroupChecker is below the higherIndex (so there are
+                    // values in the topGroup that still have to be checked), and either the
+                    // value at the bottomGroupChecker is lower than that at the topGroupChecker, or the
+                    // bottomGroupChecker is at the middleIndex, and we don't want to check those values anymore.
+                    setAside[elementsSorted] = hand[topGroupChecker];
                     topGroupChecker++;
                 }
-                elemsSorted++;
+                //increment elementsSorted so that the next element goes into setAside at the next index
+                elementsSorted++;
             }
 
             //now copy over setAside to hand
-            /*System.out.println("setAside length: " + Integer.toString(setAside.length));
-            System.out.println(Arrays.toString(setAside));*/
             this.listCards(setAside);
             for(int n = 0; n<setAside.length; n++){
                 hand[lowerIndex+n] = setAside[n];
