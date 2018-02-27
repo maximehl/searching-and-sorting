@@ -20,9 +20,12 @@ public class Runner {
         System.out.println("Merge sort!");
         d.mergeSortHand(0, 6);
         System.out.println("Merge sort done!");
-        d.shuffleDeck();
-        d.dealHand(7);
-        System.out.println("Merge sort 2!");
+        Deck c = new Deck(false);
+        c.dealHand(13);
+        System.out.println("OK, now binary search for the 3 of spades");
+        c.binarySearch(3, 0, 13);
+        c.binarySearch(4, 0, 13);
+        c.binarySearch(9, 0, 13);
     }
 }
 
@@ -109,14 +112,16 @@ class Deck{
     }
 
     public void mergeSortHand(int lowerIndex, int higherIndex){
-        //higherIndex should be index of the last value of the array, there is an object at higherIndex
+        //higherIndex should be index of the last value of the array, there must be an object at higherIndex
+
+        //System.out.println("split " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
 
         //if lowerIndex is not lower than higherIndex, they must be equal, so it's successfully broken down the
         //array to single elements
-        //System.out.println("split " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
         if(lowerIndex<higherIndex){
-            //find the center of whatever group is being sorted right now, could be the largest or a smaller group
-            //since it's an int variable, it automatically rounds to the lowest integer
+            //now find the center of whatever group is being sorted right now, it could be the largest or a smaller
+            // group
+            //since middleIndex is an int variable, it automatically rounds to the floor of whatever value it's set to
 
             // say you're just sorting a two term array, [3,2]
             //lowerIndex is 0, higherIndex is 1 (the number of things in the array), middleIndex is 0
@@ -135,37 +140,36 @@ class Deck{
             //now we have to combine the terms from the lower group and higher group
 
             //setAside is where I'll stick the elements as I compare them
-            //it's +1, since there's we're including the bottomIndex
+            //it's +1, since there's always one more element that it thinks there will be
             Card[] setAside = new Card[(higherIndex-lowerIndex)+1];
 
             //in the [3,2] example, this will make bottomGroupChecker 0, with value 3
             //and topGroupChecker will be 1, with value 2
             int bottomGroupChecker = lowerIndex;
-            //this should compare the elements from lowerIndex and including middleIndex
+            //this should compare the elements from lowerIndex and up to and including middleIndex
             int topGroupChecker = middleIndex+1;
-            //this should compare the elements from just after middleIndex and including higherIndex
+            //this should compare the elements from just after middleIndex and up to and including higherIndex
             int elementsSorted = 0;
             //System.out.println("combine " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
-            //higherIndex is always out of bounds, we never want to check there
+            //higherIndex is always included, so we need to finish there
             //middleIndex gets checked by the bottom group
-            //bottomGroup wants to stop before middleIndex+1, not check that value, and topGroup wants to stop before
-            // higherIndex, not check that value
-            while(bottomGroupChecker<middleIndex+1 || topGroupChecker<higherIndex+1){
+            //bottomGroup wants to stop at middleIndex, and topGroup wants to stop at higherIndex
+            while(bottomGroupChecker<=middleIndex || topGroupChecker<=higherIndex){
                 //if we're in here, we know that there are values that still have to be checked, either in the
                 // bottomGroup, or the topGroup, or both
-                if(topGroupChecker==higherIndex+1 ||
-                        (hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<middleIndex+1)){
-                    //if we're here, we know that either the topGroupChecker is at the higherIndex+1, and we don't
-                    // want to check those values anymore, or the bottomGroupChecker is below the middleIndex+1 (so
+                if(topGroupChecker>higherIndex ||
+                        (hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<=middleIndex)){
+                    //if we're here, we know that either the topGroupChecker is above higherIndex, so we don't
+                    // want to check those values anymore, or the bottomGroupChecker is below middleIndex+1 (so
                     // there are bottomGroup values that remain to be checked) AND the bottomGroup value is lower than
                     // the topGroup value
                     setAside[elementsSorted] = hand[bottomGroupChecker];
                     bottomGroupChecker++;
                 }else{
-                    //if we're here, then we know that the topGroupChecker is below the higherIndex (so there are
+                    //if we're here, then we know that the topGroupChecker is below or at the higherIndex (so there are
                     // values in the topGroup that still have to be checked), and either the
                     // value at the bottomGroupChecker is lower than that at the topGroupChecker, or the
-                    // bottomGroupChecker is at the middleIndex+1, and we don't want to check those values anymore.
+                    // bottomGroupChecker is above middleIndex, so we don't want to check those values anymore.
                     setAside[elementsSorted] = hand[topGroupChecker];
                     topGroupChecker++;
                 }
@@ -176,14 +180,23 @@ class Deck{
             //now copy over setAside to hand
             //this.listCards(setAside);
             System.arraycopy(setAside, 0, hand, lowerIndex, setAside.length);
-            /*for(int n = 0; n<setAside.length; n++){
-                hand[lowerIndex+n] = setAside[n];
-            }*/
             this.listCards(hand);
         }
     }
 
-    public void binarySearch(int suit, int face){
-        //nothing yet
+    public void binarySearch(int valueWanted, int lowerBound, int higherBound){
+        System.out.println("searching " + Integer.toString(lowerBound) + " " + Integer.toString(higherBound));
+        if(valueWanted==hand[lowerBound].value){
+            System.out.println(Integer.toString(valueWanted) + " is at index " + Integer.toString(lowerBound));
+        }else if(lowerBound==higherBound){
+            System.out.println(Integer.toString(valueWanted) + " does not exist in this array");
+        }else{
+            int middleIndex = (higherBound-lowerBound)/2; //error:  + lowerBound?
+            if(valueWanted<hand[middleIndex].value){
+                binarySearch(valueWanted, lowerBound, lowerBound+middleIndex);
+            }else{
+                binarySearch(valueWanted, middleIndex+1, higherBound);
+            }
+        }
     }
 }
