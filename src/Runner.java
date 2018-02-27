@@ -20,6 +20,9 @@ public class Runner {
         System.out.println("Merge sort!");
         d.mergeSortHand(0, 6);
         System.out.println("Merge sort done!");
+        d.shuffleDeck();
+        d.dealHand(7);
+        System.out.println("Merge sort 2!");
     }
 }
 
@@ -110,7 +113,7 @@ class Deck{
 
         //if lowerIndex is not lower than higherIndex, they must be equal, so it's successfully broken down the
         //array to single elements
-        System.out.println("split " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
+        //System.out.println("split " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
         if(lowerIndex<higherIndex){
             //find the center of whatever group is being sorted right now, could be the largest or a smaller group
             //since it's an int variable, it automatically rounds to the lowest integer
@@ -132,7 +135,7 @@ class Deck{
             //now we have to combine the terms from the lower group and higher group
 
             //setAside is where I'll stick the elements as I compare them
-            //+1, since there's we're including the bottomIndex
+            //it's +1, since there's we're including the bottomIndex
             Card[] setAside = new Card[(higherIndex-lowerIndex)+1];
 
             //in the [3,2] example, this will make bottomGroupChecker 0, with value 3
@@ -142,25 +145,27 @@ class Deck{
             int topGroupChecker = middleIndex+1;
             //this should compare the elements from just after middleIndex and including higherIndex
             int elementsSorted = 0;
-            System.out.println("combine " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
+            //System.out.println("combine " + Integer.toString(lowerIndex) + ' ' + Integer.toString(higherIndex));
             //higherIndex is always out of bounds, we never want to check there
-            //middleIndex gets checked by the top group
-            while(bottomGroupChecker<middleIndex || topGroupChecker<higherIndex){
+            //middleIndex gets checked by the bottom group
+            //bottomGroup wants to stop before middleIndex+1, not check that value, and topGroup wants to stop before
+            // higherIndex, not check that value
+            while(bottomGroupChecker<middleIndex+1 || topGroupChecker<higherIndex+1){
                 //if we're in here, we know that there are values that still have to be checked, either in the
                 // bottomGroup, or the topGroup, or both
-                if((hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<middleIndex)
-                        ||topGroupChecker==higherIndex){
-                    //if we're here, we know that either the topGroupChecker is at the higherIndex, and we don't
-                    // want to check those values anymore, or the bottomGroupChecker IS below the middleIndex (so there
-                    // are bottomGroup values that remain to be checked, and the bottomGroup value is lower than the
-                    // topGroup value
+                if(topGroupChecker==higherIndex+1 ||
+                        (hand[bottomGroupChecker].value<hand[topGroupChecker].value&&bottomGroupChecker<middleIndex+1)){
+                    //if we're here, we know that either the topGroupChecker is at the higherIndex+1, and we don't
+                    // want to check those values anymore, or the bottomGroupChecker is below the middleIndex+1 (so
+                    // there are bottomGroup values that remain to be checked) AND the bottomGroup value is lower than
+                    // the topGroup value
                     setAside[elementsSorted] = hand[bottomGroupChecker];
                     bottomGroupChecker++;
                 }else{
                     //if we're here, then we know that the topGroupChecker is below the higherIndex (so there are
                     // values in the topGroup that still have to be checked), and either the
                     // value at the bottomGroupChecker is lower than that at the topGroupChecker, or the
-                    // bottomGroupChecker is at the middleIndex, and we don't want to check those values anymore.
+                    // bottomGroupChecker is at the middleIndex+1, and we don't want to check those values anymore.
                     setAside[elementsSorted] = hand[topGroupChecker];
                     topGroupChecker++;
                 }
@@ -169,10 +174,11 @@ class Deck{
             }
 
             //now copy over setAside to hand
-            this.listCards(setAside);
-            for(int n = 0; n<setAside.length; n++){
+            //this.listCards(setAside);
+            System.arraycopy(setAside, 0, hand, lowerIndex, setAside.length);
+            /*for(int n = 0; n<setAside.length; n++){
                 hand[lowerIndex+n] = setAside[n];
-            }
+            }*/
             this.listCards(hand);
         }
     }
