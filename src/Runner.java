@@ -1,6 +1,6 @@
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 
 public class Runner {
     public static void main(String[] args) {
@@ -22,10 +22,13 @@ public class Runner {
         System.out.println("Merge sort done!");
         Deck c = new Deck(false);
         c.dealHand(13);
-        System.out.println("OK, now binary search for the 3 of spades");
-        c.binarySearch(3, 0, 13);
-        c.binarySearch(4, 0, 13);
-        c.binarySearch(9, 0, 13);
+        Random intGen = new Random();
+        int searchInt;
+        for(int n = 0; n<5; n++){
+            searchInt = c.hand[intGen.nextInt(c.hand.length)+1].value;
+            System.out.println("OK, now binary search for the " + Integer.toString(searchInt));
+            c.binarySearch(searchInt, 0, c.hand.length-1);
+        }
     }
 }
 
@@ -185,17 +188,17 @@ class Deck{
     }
 
     public void binarySearch(int valueWanted, int lowerBound, int higherBound){
-        System.out.println("searching " + Integer.toString(lowerBound) + " " + Integer.toString(higherBound));
-        if(valueWanted==hand[lowerBound].value){
-            System.out.println(Integer.toString(valueWanted) + " is at index " + Integer.toString(lowerBound));
+        System.out.println("searching index range " + Integer.toString(lowerBound) + " to " + Integer.toString(higherBound));
+        int middleIndex = (higherBound-lowerBound)/2+lowerBound;
+        if(valueWanted==hand[middleIndex].value){
+            System.out.println(Integer.toString(valueWanted) + " is at index " + Integer.toString(middleIndex));
         }else if(lowerBound==higherBound){
             System.out.println(Integer.toString(valueWanted) + " does not exist in this array");
         }else{
-            int middleIndex = (higherBound-lowerBound)/2; //error:  + lowerBound?
             if(valueWanted<hand[middleIndex].value){
-                binarySearch(valueWanted, lowerBound, lowerBound+middleIndex);
+                binarySearch(valueWanted, lowerBound, middleIndex);
             }else{
-                binarySearch(valueWanted, middleIndex+1, higherBound);
+                binarySearch(valueWanted, middleIndex, higherBound);
             }
         }
     }
